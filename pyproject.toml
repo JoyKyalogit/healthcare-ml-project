@@ -1,0 +1,35 @@
+[project]
+name = "healthcare-ml-project"
+version = "0.1.0"
+description = "End-to-end healthcare analytics pipeline with PostgreSQL, ML retraining, and FastAPI."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "apscheduler>=3.11.2",
+    "fastapi>=0.135.3",
+    "joblib>=1.5.3",
+    "kagglehub>=1.0.0",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "psycopg2-binary>=2.9.11",
+    "python-dotenv>=1.2.2",
+    "scikit-learn>=1.8.0",
+    "sqlalchemy>=2.0.49",
+    "uvicorn[standard]>=0.44.0",
+    "xgboost>=3.2.0",
+]
+
+[project.scripts]
+pipeline-run = "scripts.load:run_pipeline"
+train-model = "ml.train:train"
+start-scheduler = "scripts.scheduler:start_scheduler"
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["app", "database", "ml", "scripts"]
