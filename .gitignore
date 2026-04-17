@@ -1,0 +1,13 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.log
+data/raw/
+.DS_Store
+notebooks/.ipynb_checkpoints/
+uv.lock
+uv_main.py
+airflow/
+healthcare_ml_project.egg-info/
