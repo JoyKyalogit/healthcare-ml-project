@@ -21,9 +21,9 @@ def get_db():
 def test_connection():
     try:
         with engine.connect() as conn:
-            print("✅ Database connection successful!")
+            print("Database connection successful!")
     except Exception as e:
-        print(f"❌ Database connection failed: {e}")
+        print(f"Connection failed: {e}")
 
 if __name__ == "__main__":
     test_connection()

@@ -29,4 +29,5 @@ class PatientInput(BaseModel):
 
 class PredictionOutput(BaseModel):
     predicted_test_result: str
-    model_used: str = "best_model"
+    confidence: float
+    model_used: str = "xgboost"

@@ -4,7 +4,6 @@ from database.db_connection import Base
 
 class RawPatient(Base):
     __tablename__ = "raw_patients"
-
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     age = Column(Integer)
@@ -23,10 +22,8 @@ class RawPatient(Base):
     test_results = Column(String)
     created_at = Column(DateTime, server_default=func.now())
 
-
 class CleanedPatient(Base):
     __tablename__ = "cleaned_patients"
-
     id = Column(Integer, primary_key=True, index=True)
     age = Column(Integer)
     gender = Column(String)

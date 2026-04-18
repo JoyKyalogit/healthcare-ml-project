@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import PatientInput, PredictionOutput
 from app.model_loader import load_model, load_encoder
 import pandas as pd
+import joblib
+import numpy as np
 from pathlib import Path
 
 app = FastAPI(
@@ -13,7 +15,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow frontend to talk to API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,7 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve frontend files
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
 CATEGORICAL_COLUMNS = [
@@ -35,23 +35,19 @@ FEATURE_COLUMNS = [
     "admission_type", "medication", "length_of_stay"
 ]
 
-# ✅ load model ONCE (performance + stability fix)
-model = load_model("best_model")
-
-
 @app.get("/")
 def root():
     return FileResponse("frontend/index.html")
 
-
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
-
+    return {"status": "healthy", "model": "xgboost"}
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(patient: PatientInput):
     try:
+        model = load_model()
+
         input_dict = {
             "age": patient.Age,
             "gender": patient.Gender,
@@ -66,29 +62,25 @@ def predict(patient: PatientInput):
 
         df = pd.DataFrame([input_dict])
 
-        # safer encoding (handles unseen values properly)
         for col in CATEGORICAL_COLUMNS:
             le = load_encoder(col)
-
-            df[col] = df[col].astype(str).str.strip()
-
-            df[col] = df[col].apply(
-                lambda x: le.transform([x])[0]
-                if x in le.classes_
-                else le.transform([le.classes_[0]])[0]
-            )
+            df[col] = df[col].str.strip().str.title()
+            df[col] = le.transform(df[col].astype(str))
 
         df = df[FEATURE_COLUMNS]
 
+        # Get prediction and confidence
         prediction = model.predict(df)[0]
+        probabilities = model.predict_proba(df)[0]
+        confidence = round(float(np.max(probabilities) * 100), 2)
 
-        # FIXED: use loader instead of direct joblib access
-        target_encoder = load_encoder("target")
+        target_encoder = joblib.load(Path("models") / "encoder_target.joblib")
         predicted_label = target_encoder.inverse_transform([prediction])[0]
 
         return PredictionOutput(
             predicted_test_result=predicted_label,
-            model_used="best_model"
+            confidence=confidence,
+            model_used="xgboost"
         )
 
     except Exception as e:

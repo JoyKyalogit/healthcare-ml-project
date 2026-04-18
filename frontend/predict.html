@@ -18,7 +18,7 @@
             border-radius: 16px;
             padding: 25px 30px;
             width: 100%;
-            max-width: 780px;
+            max-width: 820px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         }
         .back {
@@ -70,15 +70,57 @@
         #result {
             display: none;
             margin-top: 12px;
-            padding: 14px;
+            padding: 16px;
             border-radius: 10px;
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
         }
-        .Normal { background: #f0fff4; color: #276749; border: 2px solid #68d391; }
-        .Abnormal { background: #fff5f5; color: #9b2c2c; border: 2px solid #fc8181; }
-        .Inconclusive { background: #fffff0; color: #744210; border: 2px solid #f6e05e; }
+        .result-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .result-confidence {
+            font-size: 14px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+        .result-explanation {
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.6);
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.1);
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .Normal {
+            background: #f0fff4;
+            color: #276749;
+            border: 2px solid #68d391;
+        }
+        .Normal .progress-fill { background: #48bb78; }
+        .Abnormal {
+            background: #fff5f5;
+            color: #9b2c2c;
+            border: 2px solid #fc8181;
+        }
+        .Abnormal .progress-fill { background: #fc8181; }
+        .Inconclusive {
+            background: #fffff0;
+            color: #744210;
+            border: 2px solid #f6e05e;
+        }
+        .Inconclusive .progress-fill { background: #ecc94b; }
     </style>
 </head>
 <body>
@@ -158,10 +200,24 @@
         </div>
 
         <button class="btn" onclick="predict()">Predict →</button>
-        <div id="result"></div>
+
+        <div id="result">
+            <div class="result-title" id="result-title"></div>
+            <div class="result-confidence" id="result-confidence"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="result-explanation" id="result-explanation"></div>
+        </div>
     </div>
 
     <script>
+        const explanations = {
+            "Normal": "The patient's test results appear within expected ranges. No immediate medical concern is indicated based on the provided information. Routine follow-up is recommended.",
+            "Abnormal": "The patient's test results show values outside the normal range. This may indicate an underlying health condition that requires further medical evaluation and possible treatment.",
+            "Inconclusive": "The test results do not clearly indicate a normal or abnormal condition. Additional tests or more information may be needed for a definitive diagnosis."
+        };
+
         async function predict() {
             const resultDiv = document.getElementById("result");
             resultDiv.style.display = "none";
@@ -186,16 +242,40 @@
                 });
                 const result = await res.json();
                 const label = result.predicted_test_result;
+                const confidence = result.confidence;
+
+                const icons = {
+                    "Normal": "Normal",
+                    "Abnormal": "Abnormal",
+                    "Inconclusive": "Inconclusive"
+                };
+
                 resultDiv.style.display = "block";
                 resultDiv.className = label;
-                resultDiv.textContent =
+
+                document.getElementById("result-title").textContent =
                     label === "Normal" ? "Normal" :
                     label === "Abnormal" ? "Abnormal" :
-                    " Inconclusive";
+                    "Inconclusive";
+
+                document.getElementById("result-confidence").textContent =
+                    `Model confidence: ${confidence}%`;
+
+                document.getElementById("progress-fill").style.width =
+                    `${confidence}%`;
+
+                document.getElementById("result-explanation").textContent =
+                    explanations[label];
+
             } catch (err) {
                 resultDiv.style.display = "block";
                 resultDiv.style.background = "#fff5f5";
-                resultDiv.textContent = "Error connecting to API";
+                resultDiv.style.border = "2px solid #fc8181";
+                document.getElementById("result-title").textContent =
+                    "Error connecting to API";
+                document.getElementById("result-confidence").textContent = "";
+                document.getElementById("result-explanation").textContent =
+                    "Make sure the API is running.";
             }
         }
     </script>
