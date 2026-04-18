@@ -9,8 +9,6 @@ End-to-end healthcare ML pipeline using Kaggle data, PostgreSQL, XGBoost + basel
 - Cleans and standardizes records for ML readiness.
 - Trains and compares:
   - XGBoost (required)
-  - Logistic Regression
-  - Random Forest
 - Evaluates using:
   - Accuracy
   - Precision
@@ -136,7 +134,3 @@ git remote add origin https://github.com/<your-username>/healthcare-ml-project.g
 git push -u origin main
 ```
 
-## Submission links (replace placeholders)
-
-- GitHub: `https://github.com/<your-username>/healthcare-ml-project`
-- API: `https://<your-render-service>.onrender.com/predict`
