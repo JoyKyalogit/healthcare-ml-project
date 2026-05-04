@@ -8,7 +8,7 @@ End-to-end healthcare ML pipeline using Kaggle data, PostgreSQL, XGBoost + basel
 - Stores raw data in PostgreSQL.
 - Cleans and standardizes records for ML readiness.
 - Trains and compares:
-  - XGBoost (required)
+  - XGBoost 
 - Evaluates using:
   - Accuracy
   - Precision
