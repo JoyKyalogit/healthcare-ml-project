@@ -2,6 +2,9 @@
 
 End-to-end healthcare ML pipeline using Kaggle data, PostgreSQL, XGBoost + baseline models, and FastAPI deployment for live predictions.
 
+## Live Demo
+https://healthcare-ml-project-o600.onrender.com
+
 ## What this project does
 
 - Downloads the Kaggle healthcare dataset (`prasad22/healthcare-dataset`).
